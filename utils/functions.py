@@ -1,19 +1,21 @@
 import os
 import cv2
+import base64
 import numpy as np
+from PIL import Image
+from io import BytesIO
 
-def open_file_with_bee_frames(image_path, json_bee_data):
 
-    os.makedirs("output", exist_ok=True)
+def put_bee_frames_on_file(image_path, json_bee_data):
 
     # Reading image and its size
     image = cv2.imread(image_path)
     height, width, _ = image.shape
     frame_area = width * height
-    
+ 
     # Creating mask
     mask = np.zeros((height, width), dtype=np.uint8)
-
+    
     for pred in json_bee_data["predictions"]:
         points = np.array([[p["x"], p["y"]] for p in pred["points"]], dtype=np.int32)
         cv2.fillPoly(mask, [points], 255)
@@ -21,7 +23,6 @@ def open_file_with_bee_frames(image_path, json_bee_data):
     # Compute coverage
     bee_pixels = np.count_nonzero(mask)
     coverage = (bee_pixels / frame_area) * 100
-    num_preds = len(json_bee_data.get("predictions", []))
 
     # Visual overlay
     overlay = image.copy()
@@ -30,6 +31,21 @@ def open_file_with_bee_frames(image_path, json_bee_data):
     cv2.putText(blended, f"Coverage: {coverage:.2f}%",
         (30, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (55, 205, 55), 3)
 
-    output_file = image_path.replace("images", "output")
-    cv2.imwrite(output_file, blended)
-    print(f"Saved in {output_file}")
+    return blended
+
+
+def numpy_to_base64(image_array):
+    if len(image_array.shape) == 3 and image_array.shape[2] == 3:
+        image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
+    
+    # Convert to PIL Image
+    pil_image = Image.fromarray(image_array)
+    
+    # Save to BytesIO
+    buffered = BytesIO()
+    pil_image.save(buffered, format="JPEG", quality=95)
+    
+    # Encode to base64
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+    
+    return f"data:image/jpeg;base64,{img_str}"
