@@ -1,5 +1,5 @@
 import os
-from dash import Dash, html, dcc, Input, Output
+from dash import ctx, Dash, html, dcc, Input, Output, State
 from flask import send_file, request
 
 ROOT = os.getcwd()
@@ -61,6 +61,8 @@ def build_tree(path, root=ROOT):
 app.layout = html.Div([
 
     dcc.Store(id="selected-folder", data=ROOT),
+    dcc.Store(id="image-list"),
+    dcc.Store(id="image-index", data=0),
 
     html.H2("Przeglądarka plików"),
 
@@ -78,11 +80,25 @@ app.layout = html.Div([
         ),
 
         html.Div(
-            id="file-list",
-            style={
-                "width": "65%",
-                "padding": "20px"
-            }
+        [
+
+            html.Div(id="file-list"),
+
+            html.Br(),
+
+            html.Button("◀", id="prev"),
+
+            html.Button(
+                "▶",
+                id="next",
+                style={"marginLeft": "10px"}
+            )
+
+        ],
+        style={
+            "width": "65%",
+            "padding": "20px"
+        }
         )
 
     ],
@@ -121,43 +137,80 @@ def choose_folder(clicks):
     return os.path.join(ROOT, path)
 
 
-@app.callback(
-    Output("file-list", "children"),
-    Input("selected-folder", "data")
-)
-def show_files(folder):
 
-    try:
-        entries = sorted(os.listdir(folder))
-    except:
-        return "Brak dostępu"
+@app.callback(
+    Output("image-list", "data"),
+    Output("image-index", "data", allow_duplicate=True),
+    Input("selected-folder", "data"),
+    prevent_initial_call=True
+)
+def load_images(folder):
 
     extensions = (".jpg", ".jpeg", ".png")
 
-    first_image = None
+    images = []
 
-    for entry in entries:
-        if entry.lower().endswith(extensions):
-            first_image = os.path.join(folder, entry)
-            break
+    for f in sorted(os.listdir(folder)):
+        if f.lower().endswith(extensions):
+            images.append(os.path.join(folder, f))
 
-    if first_image is None:
+    return images, 0
+
+
+
+@app.callback(
+    Output("image-index", "data", allow_duplicate=True),
+    Input("prev", "n_clicks"),
+    Input("next", "n_clicks"),
+    State("image-index", "data"),
+    State("image-list", "data"),
+    prevent_initial_call=True
+)
+def change_image(prev, nxt, index, images):
+
+    if not images:
+        return 0
+
+    trigger = ctx.triggered_id
+
+    if trigger == "prev":
+        return (index - 1) % len(images)
+
+    if trigger == "next":
+        return (index + 1) % len(images)
+
+    return index
+
+@app.callback(
+    Output("file-list", "children"),
+    Input("image-list", "data"),
+    Input("image-index", "data")
+)
+def show_image(images, index):
+
+    if not images:
         return html.H3("Brak zdjęć")
+
+    image = images[index]
 
     return html.Div(
         [
-            html.H3(os.path.basename(first_image)),
+
+            html.H3(f"{index+1}/{len(images)}"),
+
+            html.H4(os.path.basename(image)),
+
             html.Img(
-                src=f"/image?path={first_image}",
+                src=f"/image?path={image}",
                 style={
                     "maxWidth": "100%",
                     "maxHeight": "650px",
                     "objectFit": "contain"
                 }
             )
+
         ]
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
