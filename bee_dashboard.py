@@ -1,6 +1,6 @@
 import os
-
 from dash import Dash, html, dcc, Input, Output
+from flask import send_file, request
 
 ROOT = os.getcwd()
 
@@ -95,6 +95,12 @@ app.layout = html.Div([
 
 from dash import ALL
 
+@app.server.route("/image")
+def serve_image():
+
+    path = request.args.get("path")
+
+    return send_file(path)
 
 @app.callback(
     Output("selected-folder", "data"),
@@ -121,25 +127,36 @@ def choose_folder(clicks):
 )
 def show_files(folder):
 
-    rows = []
-
-    rows.append(html.H3(folder))
-
     try:
         entries = sorted(os.listdir(folder))
     except:
         return "Brak dostępu"
 
+    extensions = (".jpg", ".jpeg", ".png")
+
+    first_image = None
+
     for entry in entries:
+        if entry.lower().endswith(extensions):
+            first_image = os.path.join(folder, entry)
+            break
 
-        full = os.path.join(folder, entry)
+    if first_image is None:
+        return html.H3("Brak zdjęć")
 
-        if os.path.isdir(full):
-            rows.append(html.Div("📁 " + entry))
-        else:
-            rows.append(html.Div("📄 " + entry))
-
-    return rows
+    return html.Div(
+        [
+            html.H3(os.path.basename(first_image)),
+            html.Img(
+                src=f"/image?path={first_image}",
+                style={
+                    "maxWidth": "100%",
+                    "maxHeight": "650px",
+                    "objectFit": "contain"
+                }
+            )
+        ]
+    )
 
 
 if __name__ == "__main__":
