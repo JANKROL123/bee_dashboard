@@ -63,6 +63,7 @@ app.layout = html.Div([
     dcc.Store(id="selected-folder", data=ROOT),
     dcc.Store(id="image-list"),
     dcc.Store(id="image-index", data=0),
+    dcc.Store(id="coverage-mode", data=False),
 
     html.H2("Przeglądarka plików"),
 
@@ -83,6 +84,18 @@ app.layout = html.Div([
         [
 
             html.Div(id="file-list"),
+
+            html.Img(
+                id="current-image",
+                n_clicks=0,
+                style={
+                    "maxWidth": "100%",
+                    "maxHeight": "650px",
+                    "objectFit": "contain",
+                    "cursor": "pointer"
+                }
+            ),
+
 
             html.Br(),
 
@@ -184,14 +197,24 @@ def change_image(prev, nxt, index, images):
 @app.callback(
     Output("file-list", "children"),
     Input("image-list", "data"),
-    Input("image-index", "data")
+    Input("image-index", "data"),
+    Input("coverage-mode", "data")
 )
-def show_image(images, index):
+def show_image(images, index, coverage):
 
     if not images:
         return html.H3("Brak zdjęć")
 
     image = images[index]
+    style = {
+        "maxWidth": "100%",
+        "maxHeight": "650px",
+        "objectFit": "contain",
+        "cursor": "pointer"
+    }
+
+    if coverage:
+        style["filter"] = "brightness(0%)"
 
     return html.Div(
         [
@@ -201,16 +224,22 @@ def show_image(images, index):
             html.H4(os.path.basename(image)),
 
             html.Img(
+                id="current-image",
+                n_clicks=0,
                 src=f"/image?path={image}",
-                style={
-                    "maxWidth": "100%",
-                    "maxHeight": "650px",
-                    "objectFit": "contain"
-                }
+                style=style
             )
 
         ]
     )
+@app.callback(
+    Output("coverage-mode", "data"),
+    Input("current-image", "n_clicks"),
+    State("coverage-mode", "data"),
+    prevent_initial_call=True
+)
+def toggle_coverage(n_clicks, coverage):
 
+    return not coverage
 if __name__ == "__main__":
     app.run(debug=True)
