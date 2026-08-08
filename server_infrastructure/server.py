@@ -17,8 +17,7 @@ from PIL import Image
 from io import BytesIO
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
-IMAGE_FOLDER = "images"
-ROOT = os.getcwd()
+ROOT = os.getcwd() + "/images"
 
 def put_bee_frames_on_file(image_path, json_bee_data):
 
