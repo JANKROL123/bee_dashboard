@@ -52,7 +52,7 @@ def build_tree(path, root=ROOT):
     try:
         entries = sorted(os.listdir(path))
     except PermissionError:
-        return html.Div("Brak dostępu")
+        return html.Div("No access")
 
     for entry in entries:
 
@@ -313,7 +313,7 @@ def start_dash(host: str, port: int, server_is_started: Condition):
     def show_image(images, index, coverage):
 
         if not images:
-            return html.H3("Brak zdjęć")
+            return html.H3("Choose directory")
 
         image = images[index]
         style = {
