@@ -12,7 +12,6 @@ import json
 from flask import send_file, request
 from multiprocessing import Condition
 from dash import ALL, Dash, html, dcc, callback, Output, Input, State, callback_context
-
 from PIL import Image
 from io import BytesIO
 
@@ -199,8 +198,12 @@ def start_dash(host: str, port: int, server_is_started: Condition):
                     "▶",
                     id="next",
                     style={"marginLeft": "10px"}
+                ),
+                html.Button(
+                    "View coverage",
+                    id="view-coverage",
+                    style={"marginLeft": "10px"}
                 )
-
             ],
             style={
                 "width": "65%",
@@ -332,7 +335,6 @@ def start_dash(host: str, port: int, server_is_started: Condition):
 
                 html.Img(
                     id="current-image",
-                    n_clicks=0,
                     src=f"/image?path={image}&coverage={int(coverage)}&t={time.time_ns()}",
                     style=style
                 )
@@ -342,12 +344,11 @@ def start_dash(host: str, port: int, server_is_started: Condition):
 
     @app.callback(
         Output("coverage-mode", "data"),
-        Input("current-image", "n_clicks"),
+        Input("view-coverage", "n_clicks"),
         State("coverage-mode", "data"),
         prevent_initial_call=True
     )
     def toggle_coverage(n_clicks, coverage):
-
         return not coverage
     
     with server_is_started:
