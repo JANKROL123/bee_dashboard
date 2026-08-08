@@ -1,4 +1,7 @@
 # Bee detection YOLOv11 dataset
 
 
-Make sure the PNG file exists in dedicated images folder with provided JSON predictions. 
+This dataset uses [resources](https://www.kaggle.com/datasets/ashfaqsyed/bees-dataset) available on Kaggle named Bees Dataset.
+
+Noninvasive bee tracking in videos: deep learning algorithms and cloud platform design specifications. Dataset, 2021.
+
