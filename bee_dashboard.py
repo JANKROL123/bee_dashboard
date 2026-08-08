@@ -29,7 +29,7 @@ def start():
     time.sleep(0.2)
 
     # Create the webview.
-    webview.create_window('Dash', f'http://{host}:{port}')
+    webview.create_window("Bee dashboard", f'http://{host}:{port}')
     webview.start()
 
     # Reached when window is closed.

@@ -159,7 +159,7 @@ def start_dash(host: str, port: int, server_is_started: Condition):
         dcc.Store(id="image-index", data=0),
         dcc.Store(id="coverage-mode", data=False),
 
-        html.H2("Przeglądarka plików"),
+        html.H2("Bee image search"),
 
         html.Div([
 
@@ -211,7 +211,8 @@ def start_dash(host: str, port: int, server_is_started: Condition):
         ],
         style={
             "display": "flex"
-        })
+        }),
+        html.Div("Noninvasive bee tracking in videos: deep learning algorithms and cloud platform design specifications. Dataset, 2021.", style={"text-align": "center"}),
 
     ])
 
