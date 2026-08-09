@@ -12,7 +12,6 @@ import json
 from flask import send_file, request
 from multiprocessing import Condition
 from dash import ALL, Dash, html, dcc, callback, Output, Input, State, callback_context
-
 from PIL import Image
 from io import BytesIO
 
@@ -52,7 +51,7 @@ def build_tree(path, root=ROOT):
     try:
         entries = sorted(os.listdir(path))
     except PermissionError:
-        return html.Div("Brak dostępu")
+        return html.Div("No access")
 
     for entry in entries:
 
@@ -159,7 +158,7 @@ def start_dash(host: str, port: int, server_is_started: Condition):
         dcc.Store(id="image-index", data=0),
         dcc.Store(id="coverage-mode", data=False),
 
-        html.H2("Przeglądarka plików"),
+        html.H2("Bee image search"),
 
         html.Div([
 
@@ -199,8 +198,12 @@ def start_dash(host: str, port: int, server_is_started: Condition):
                     "▶",
                     id="next",
                     style={"marginLeft": "10px"}
+                ),
+                html.Button(
+                    "View coverage",
+                    id="view-coverage",
+                    style={"marginLeft": "10px"}
                 )
-
             ],
             style={
                 "width": "65%",
@@ -211,7 +214,8 @@ def start_dash(host: str, port: int, server_is_started: Condition):
         ],
         style={
             "display": "flex"
-        })
+        }),
+        html.Div("Noninvasive bee tracking in videos: deep learning algorithms and cloud platform design specifications. Dataset, 2021.", style={"text-align": "center"}),
 
     ])
 
@@ -312,7 +316,7 @@ def start_dash(host: str, port: int, server_is_started: Condition):
     def show_image(images, index, coverage):
 
         if not images:
-            return html.H3("Brak zdjęć")
+            return html.H3("Choose directory")
 
         image = images[index]
         style = {
@@ -331,7 +335,6 @@ def start_dash(host: str, port: int, server_is_started: Condition):
 
                 html.Img(
                     id="current-image",
-                    n_clicks=0,
                     src=f"/image?path={image}&coverage={int(coverage)}&t={time.time_ns()}",
                     style=style
                 )
@@ -341,12 +344,11 @@ def start_dash(host: str, port: int, server_is_started: Condition):
 
     @app.callback(
         Output("coverage-mode", "data"),
-        Input("current-image", "n_clicks"),
+        Input("view-coverage", "n_clicks"),
         State("coverage-mode", "data"),
         prevent_initial_call=True
     )
     def toggle_coverage(n_clicks, coverage):
-
         return not coverage
     
     with server_is_started:
