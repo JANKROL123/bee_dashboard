@@ -40,10 +40,8 @@ def put_bee_frames_on_file(image_path, json_bee_data):
     overlay = image.copy()
     overlay[mask == 255] = (0, 255, 0)
     blended = cv2.addWeighted(image, 0.7, overlay, 0.3, 0)
-    cv2.putText(blended, f"Coverage: {coverage:.2f}%",
-        (30, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (55, 205, 55), 3)
 
-    return blended
+    return blended, coverage, len(json_bee_data["predictions"])
 
 def build_tree(path, root=ROOT):
     children = []
@@ -203,7 +201,15 @@ def start_dash(host: str, port: int, server_is_started: Condition):
                     "View coverage",
                     id="view-coverage",
                     style={"marginLeft": "10px"}
-                )
+                ),
+                html.Div(
+                    id="coverage-display",
+                    style={
+                        "fontSize": "20px",
+                        "fontWeight": "bold",
+                        "marginTop": "15px"
+                    }
+                ),
             ],
             style={
                 "width": "65%",
@@ -234,7 +240,7 @@ def start_dash(host: str, port: int, server_is_started: Condition):
         with open(json_path, "r") as f:
             json_bee_data = json.load(f)
 
-        image = put_bee_frames_on_file(path, json_bee_data)
+        image, _, _ = put_bee_frames_on_file(path, json_bee_data)
 
 
         _, buffer = cv2.imencode(".png", image)
@@ -262,7 +268,35 @@ def start_dash(host: str, port: int, server_is_started: Condition):
 
         return os.path.join(ROOT, path)
 
+    @app.callback(
+        Output("coverage-display", "children"),
+        Input("image-list", "data"),
+        Input("image-index", "data"),
+        Input("coverage-mode", "data")
+    )
+    def show_coverage(images, index, coverage_mode):
 
+        if not images:
+            return ""
+
+        if not coverage_mode:
+            return ""
+
+        image_path = images[index]
+        json_path = os.path.splitext(image_path)[0] + ".json"
+
+        if not os.path.exists(json_path):
+            return "Coverage: brak danych"
+
+        with open(json_path, "r") as f:
+            json_bee_data = json.load(f)
+
+        _, coverage, bee_count = put_bee_frames_on_file(
+            image_path,
+            json_bee_data
+        )
+
+        return f"Coverage: {coverage:.2f}%\nDetected bees: {bee_count}"
 
     @app.callback(
         Output("image-list", "data"),
