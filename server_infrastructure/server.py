@@ -17,7 +17,7 @@ from io import BytesIO
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 ROOT = os.getcwd() + "/images"
-
+callback
 def put_bee_frames_on_file(image_path, json_bee_data):
 
     # Reading image and its size
@@ -63,19 +63,18 @@ def build_tree(path, root=ROOT):
                 html.Details(
                     [
                         html.Summary(
-                            html.Button(
                                 "📁 " + entry,
                                 id={
                                     "type": "folder",
                                     "path": relative
                                 },
+                                n_clicks=0,
                                 style={
                                     "border": "none",
                                     "background": "white",
                                     "cursor": "pointer",
                                     "fontSize": "15px"
                                 }
-                            )
                         ),
 
                         html.Div(
