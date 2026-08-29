@@ -1,4 +1,6 @@
 build_json_predictions.ipynb
+bee_counter.py 
+clipper.py
 output
 __pychace__
 utils/__pycache__
