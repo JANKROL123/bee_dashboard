@@ -1,6 +1,7 @@
 build_json_predictions.ipynb
 bee_counter.py 
 clipper.py
+.env
 output
 __pychace__
 utils/__pycache__
