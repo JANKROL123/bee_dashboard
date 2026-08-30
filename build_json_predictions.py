@@ -13,7 +13,7 @@ project = rf.workspace().project("beedetection-jr2a8")
 model = project.version("1").model
 
 # Image folder
-input_folder = "images/public_source/pub_subset_7"
+input_folder = "images/private_source/priv_subset_1"
 
 
 # Results CSV
@@ -26,7 +26,7 @@ for i, filename in enumerate(sorted(image_files), start=1):
     # Prediction
     result = model.predict(image_path).json()
     json_result_file = filename.split(".")[0] + ".json"
-    with open(f"images/public_source/pub_subset_7/{json_result_file}", "w") as f:
+    with open(f"images/private_source/priv_subset_1/{json_result_file}", "w") as f:
         json.dump(result, f)
 
 print(f"Saving to JSON files completed")

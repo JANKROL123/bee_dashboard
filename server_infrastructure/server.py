@@ -73,7 +73,7 @@ def build_tree(path, root=ROOT):
                                     "border": "none",
                                     "background": "white",
                                     "cursor": "pointer",
-                                    "fontSize": "15px"
+                                    "fontSize": "3vh"
                                 }
                         ),
 
@@ -166,49 +166,56 @@ def start_dash(host: str, port: int, server_is_started: Condition):
                     "overflow": "auto",
                     "height": "700px",
                     "borderRight": "1px solid gray",
-                    "padding": "10px"
+                    "padding": "10px",
+                    "fontSize": "2em"
                 }
             ),
 
             html.Div(
             [
+                html.Div([
+                    html.Div(id="file-list"),
 
-                html.Div(id="file-list"),
+                    html.Button("◀", id="prev"),
+                    
+                    html.Button(
+                        "▶",
+                        id="next",
+                        style={"marginLeft": "10px"}
+                    ),
 
-                html.Img(
-                    id="current-image",
-                    n_clicks=0,
-                    style={
-                        "maxWidth": "100%",
-                        "maxHeight": "650px",
-                        "objectFit": "contain",
-                        "cursor": "pointer"
-                    }
-                ),
+                    html.Button(
+                        "View coverage",
+                        id="view-coverage",
+                        style={"marginLeft": "10px"}
+                    ),
 
+                    html.Div(
+                        id="coverage-display",
+                        style={
+                            "fontSize": "20px",
+                            "fontWeight": "bold",
+                            "marginTop": "15px"
+                        }
+                    ),
 
-                html.Br(),
-
-                html.Button("◀", id="prev"),
-
-                html.Button(
-                    "▶",
-                    id="next",
-                    style={"marginLeft": "10px"}
-                ),
-                html.Button(
-                    "View coverage",
-                    id="view-coverage",
-                    style={"marginLeft": "10px"}
-                ),
-                html.Div(
-                    id="coverage-display",
-                    style={
-                        "fontSize": "20px",
-                        "fontWeight": "bold",
-                        "marginTop": "15px"
-                    }
-                ),
+                    html.Br(),
+                ]),
+                html.Div([
+                    html.Img(
+                        id="current-image",
+                        n_clicks=0,
+                        style={
+                            "display": "block",
+                            "maxWidth": "100%",
+                            "maxHeight": "650px",
+                            "objectFit": "contain",
+                            "cursor": "pointer"
+                        }
+                    )
+                ]),
+                
+                
             ],
             style={
                 "width": "65%",
@@ -220,7 +227,12 @@ def start_dash(host: str, port: int, server_is_started: Condition):
         style={
             "display": "flex"
         }),
-        html.Div("Noninvasive bee tracking in videos: deep learning algorithms and cloud platform design specifications. Dataset, 2021.", style={"text-align": "center"}),
+        html.Div("Noninvasive bee tracking in videos: deep learning algorithms and cloud platform design specifications. Dataset, 2021.", 
+                style={
+                    "text-align": "center",
+                    "marginTop": "15vh"
+                }
+        ),
 
     ])
 
